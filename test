@@ -1,0 +1,146 @@
+local plr = game.Players.LocalPlayer
+
+local hiding = false
+local connecteds = {}
+
+local function lookAtTarget(targetPosition)
+    local camera = workspace.CurrentCamera
+    local character = plr.Character
+    
+    local headPosition = character:FindFirstChild("Head") and character.Head.Position or character.PrimaryPart.Position
+    local direction = (targetPosition - headPosition).Unit
+    
+    camera.CFrame = CFrame.lookAt(headPosition, targetPosition)
+end
+
+local function getCurrentRoom()
+    local current_room = workspace.GameData.CurrentRoom.Value
+    if not current_room then
+        
+        if workspace.CurrentRooms:FindFirstChild("0") then return workspace.CurrentRooms["0"] end
+        return nil
+    end
+
+    return current_room
+end
+
+local function playerHasKeycard()
+    if plr.Backpack:FindFirstChild("Keycard") then
+        return true
+    end
+    
+    if plr.Character and plr.Character:FindFirstChild("Keycard") then
+        return true
+    end
+    
+    return false
+end
+
+local function open_door() 
+
+    local currentRooms = workspace.CurrentRooms
+    local rooms = currentRooms:GetChildren()
+    local room = rooms[#rooms-1]
+
+    local door
+    local door_proxi: ProximityPrompt
+    if room:FindFirstChild("Door") then
+
+        door = room.Door
+        for _, i in ipairs(door:GetDescendants()) do
+            if i.Name == "KeycardScanner" then
+                door_proxi = i.Screen1.Hold
+            end
+        end
+    elseif room:FindFirstChild("Door50Gate") then
+        door = room.Door50Gate
+    end
+
+    if not playerHasKeycard() then
+        for _, i:Part in ipairs(room:GetDescendants()) do
+            if i.Name == "Keycard" and i:FindFirstChildWhichIsA("ProximityPrompt") then
+                
+                print("Нашел ключ-карту:", i)
+                plr.Character.PrimaryPart.CFrame = i:GetPivot() * CFrame.new(6, 0, 6)
+
+                local proxi:ProximityPrompt = i:FindFirstChildWhichIsA("ProximityPrompt")
+                proxi.Enabled = true
+                proxi.HoldDuration = 0
+                proxi.MaxActivationDistance = 10000
+                
+                lookAtTarget(i:GetPivot().Position)
+
+                local conn = proxi.PromptShown:Connect(function()
+                    fireproximityprompt(proxi)
+                end)
+                table.insert(connecteds, conn)
+
+                repeat 
+                    lookAtTarget(i:GetPivot().Position) 
+                    fireproximityprompt(proxi) 
+                    task.wait(0.1)
+                until playerHasKeycard()
+                
+                conn:Disconnect()
+                task.wait(1)
+            end
+        end
+    end
+
+    plr.Character.PrimaryPart.CFrame = door:GetPivot()
+    task.wait(0.4)
+
+    if door_proxi then
+        lookAtTarget(door_proxi.Parent.Position)
+        door_proxi.HoldDuration = 0
+        fireproximityprompt(door_proxi)
+    end
+end
+
+local entityes = workspace.Entities :: Model
+
+entityes.ChildAdded:Connect(function(child)
+    
+    if child.Name == "Cue" or child.Name == "Route" then
+        hiding = true
+    end
+end)
+
+game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Events"):WaitForChild("RemoteServer"):WaitForChild("PreRunShop"):FireServer(unpack({}))
+task.wait(1)
+game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Events"):WaitForChild("FireVote"):FireServer()
+
+local is_death = false
+plr.Character.Humanoid:GetPropertyChangedSignal("Health"):Connect(function()
+
+    if is_death then return end
+
+    print(1)
+    if plr.Character.Humanoid.Health == 0 then
+        is_death = true
+
+        local text = plr.PlayerGui.MainUI.Overview.Bottom.PlayAgain.Header.Timer.Text 
+
+        while task.wait(1) do
+            if plr.PlayerGui.MainUI.Overview.Bottom.PlayAgain.Header.Timer.Text ~= text then break end
+            local args = {
+                "Toggle"
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Events"):WaitForChild("RequestPlayAgain"):FireServer(unpack(args))
+        end
+
+    end
+end)
+
+task.spawn(function()
+    while task.wait(1) do
+        
+        if plr:GetAttribute("InCutscene") then continue end
+        if hiding then continue end
+
+        local room = getCurrentRoom()
+        if not (tonumber(room.Name) >= 109) then
+            open_door() end
+    end    
+end)
+
