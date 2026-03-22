@@ -1,4 +1,5 @@
 local plr = game.Players.LocalPlayer
+local vim = game:GetService("VirtualInputManager")
 
 local hiding = false
 local connecteds = {}
@@ -34,6 +35,14 @@ local function playerHasKeycard()
     end
     
     return false
+end 
+
+local function click_center()
+    local screenSize = workspace.CurrentCamera.ViewportSize
+    local centerX, centerY = screenSize.X / 2, screenSize.Y / 2
+    
+    vim:SendMouseButtonEvent(centerX, centerY, 0, true, game, 0)
+    vim:SendMouseButtonEvent(centerX, centerY, 0, false, game, 0)
 end
 
 local function open_door() 
@@ -106,7 +115,10 @@ entityes.ChildAdded:Connect(function(child)
     end
 end)
 
-for i,v in pairs(getconnections(game:GetService("Players").LocalPlayer.PlayerGui.PreRunShop.Canvas.Holder.ConfirmHolder.Confirm.MouseButton1Click)) do v:Fire() end
+if game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("PreRunShop") then
+    for i,v in pairs(getconnections(game:GetService("Players").LocalPlayer.PlayerGui.PreRunShop.Canvas.Holder.ConfirmHolder.Confirm.MouseButton1Click)) do v:Fire() end
+end
+
 task.wait(1)
 game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Events"):WaitForChild("FireVote"):FireServer()
 
@@ -118,11 +130,19 @@ plr.Character.Humanoid:GetPropertyChangedSignal("Health"):Connect(function()
     print(1)
     if plr.Character.Humanoid.Health == 0 then
         is_death = true
+        local clikking = false
 
         local text = plr.PlayerGui.MainUI.Overview.Bottom.PlayAgain.Header.Timer.Text 
+        task.spawn(function()
+            while task.wait(0.1) do
+                if clikking then break end
+                click_center()
+            end
+        end)
 
         while task.wait(1) do
-            if plr.PlayerGui.MainUI.Overview.Bottom.PlayAgain.Header.Timer.Text ~= text then break end
+            if plr.PlayerGui.MainUI.Overview.Bottom.PlayAgain.Header.Timer.Text ~= text then clikking = true break end
+
             local args = {
                 "Toggle"
             }
