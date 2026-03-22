@@ -74,10 +74,10 @@ local function open_door()
 
             if i.Name == "KillBlock" then
                 
-                plr.Character.PrimaryPart.CFrame = i:GetPivot()
-                print(123456)
-                task.wait(5)
-                break
+               -- plr.Character.PrimaryPart.CFrame = i:GetPivot()
+               -- print(123456)
+              --  task.wait(5)
+              --  break
             end
 
             if i.Name == "Keycard" and i:FindFirstChildWhichIsA("ProximityPrompt") then
