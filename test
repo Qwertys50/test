@@ -85,9 +85,11 @@ local function open_door()
                 table.insert(connecteds, conn)
 
                 repeat 
+                    
+                    plr.Character.PrimaryPart.CFrame = i:GetPivot() * CFrame.new(6, 0, 6)
                     lookAtTarget(i:GetPivot().Position) 
                     fireproximityprompt(proxi) 
-                    task.wait(0.1)
+                    task.wait(0.5)
                 until playerHasKeycard()
                 
                 conn:Disconnect()
