@@ -3,6 +3,7 @@ local vim = game:GetService("VirtualInputManager")
 
 print("Load")
 local Character = plr.Character or plr.CharacterAdded:Wait() 
+task.wait(5)
 print("GO!")
 local hiding = false
 local connecteds = {}
