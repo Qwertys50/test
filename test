@@ -154,7 +154,13 @@ end)
 
 task.spawn(function()
     while task.wait(1) do
-        
+        local args = {
+        	{
+        		Action = "Complete"
+        	}
+        }
+        game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Events"):WaitForChild("Entities"):WaitForChild("Shade"):WaitForChild("ShadeEvent"):FireServer(unpack(args))
+
         if plr:GetAttribute("InCutscene") then continue end
         if hiding then continue end
 
