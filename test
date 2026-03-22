@@ -2,9 +2,7 @@ local plr = game.Players.LocalPlayer
 local vim = game:GetService("VirtualInputManager")
 
 print("Load")
-local Character = player.Character or player.CharacterAdded:Wait() 
-
-game.Loaded:Wait()
+local Character = plr.Character or plr.CharacterAdded:Wait() 
 print("GO!")
 local hiding = false
 local connecteds = {}
@@ -76,6 +74,8 @@ local function open_door()
             if i.Name == "KillBlock" then
                 
                 plr.Character.PrimaryPart.CFrame = i:GetPivot()
+                print(123456)
+                task.wait(5)
                 break
             end
 
