@@ -106,7 +106,7 @@ entityes.ChildAdded:Connect(function(child)
     end
 end)
 
-game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Events"):WaitForChild("RemoteServer"):WaitForChild("PreRunShop"):FireServer(unpack({}))
+for i,v in pairs(getconnections(game:GetService("Players").LocalPlayer.PlayerGui.PreRunShop.Canvas.Holder.ConfirmHolder.Confirm.MouseButton1Click)) do v:Fire() end
 task.wait(1)
 game:GetService("ReplicatedStorage"):WaitForChild("Assets"):WaitForChild("Events"):WaitForChild("FireVote"):FireServer()
 
