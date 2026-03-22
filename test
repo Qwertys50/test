@@ -1,6 +1,8 @@
 local plr = game.Players.LocalPlayer
 local vim = game:GetService("VirtualInputManager")
 
+game.Loaded:Wait()
+
 local hiding = false
 local connecteds = {}
 
