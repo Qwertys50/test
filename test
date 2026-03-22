@@ -114,7 +114,8 @@ local function open_door()
     plr.Character.PrimaryPart.CFrame = door:GetPivot()
     task.wait(0.4)
 
-    if door_proxi then
+    if door_proxi and door_proxi.Parent then
+
         lookAtTarget(door_proxi.Parent.Position)
         door_proxi.HoldDuration = 0
         fireproximityprompt(door_proxi)
