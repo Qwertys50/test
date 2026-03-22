@@ -72,6 +72,13 @@ local function open_door()
 
     if not playerHasKeycard() then
         for _, i:Part in ipairs(room:GetDescendants()) do
+
+            if i.Name == "KillBlock" then
+                
+                plr.Character.PrimaryPart.CFrame = i:GetPivot()
+                break
+            end
+
             if i.Name == "Keycard" and i:FindFirstChildWhichIsA("ProximityPrompt") then
                 
                 print("Нашел ключ-карту:", i)
@@ -134,7 +141,6 @@ plr.Character.Humanoid:GetPropertyChangedSignal("Health"):Connect(function()
 
     if is_death then return end
 
-    print(1)
     if plr.Character.Humanoid.Health == 0 then
         is_death = true
         local clikking = false
@@ -176,4 +182,3 @@ task.spawn(function()
             open_door() end
     end    
 end)
-
